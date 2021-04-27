@@ -1,0 +1,167 @@
+﻿@{
+}
+Note: decimal separator is ".", order of operations: BoundingBox, Scale, Alpha, Background
+<div class="card">
+    <div class="card-header">
+        Transform SVG
+    </div>
+    <div class="card-body">        
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header">
+                            Parameters
+                        </div>
+                        <div class="card-body">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col">
+                                        <label>
+                                            <input type="checkbox" id="chkBoundingBox" name="chkBoundingBox">
+                                            BoundingBox: <input type="number" id="txtBoundingBox" name="txtBoundingBox" class="" value="32.23" min="0.1" max="65535" style="width: 80px">
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <label>
+                                            <input type="checkbox" id="chkScale" name="chkScale">
+                                            Scale all (%): <input type="number" id="txtScale" name="txtScale" class="" value="50" min="1" max="100">
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <label>
+                                            <input type="checkbox" id="chkScale2" name="chkScale2">
+                                            Scale only paths (%): <input type="number" id="txtScale2" name="txtScale2" class="" value="50" min="1" max="100">
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <label>
+                                            <input type="checkbox" id="chkAlpha" name="chkAlpha">
+                                            Alpha: <input type="number" id="txtAlpha" name="txtAlpha" class="" value="128" min="0" max="255">
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <label>
+                                            <input type="checkbox" id="chkBackground" name="chkBackground">
+                                            Background: <input type="color" id="txtBackground" name="txtBackground" value="#FFFFFF">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2 imgUp">
+                    <div class="imgTitle">Original</div>
+                    <div class="imagePreview"></div>
+                    <label class="btn btn-primary btnNormal">
+                        Upload<input type="file" class="uploadFile img" value="Upload Photo" style="width: 0px;height: 0px;overflow: hidden;">
+                    </label>
+                </div>
+                <div class="col-sm-2 imgUp">
+                    <div class="imgTitle">Processed</div>
+                    <div class="imagePreview"><img id="finalImg" class="imagePreview" src='@Url.Content("~/Content/imgs/onePix.png")' alt="" /></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2 imgUp">
+                    <a id="lnkDownload" href="#" download="imgFile.bmp">Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="background: #b7b799">
+    <img src="~/Content/imgs/mandala1.svg" width="160" height="160" class="d-inline-block align-top" alt="">
+    <img src="~/Content/imgs/mandala1.svg" width="160" height="160" class="d-inline-block align-top" alt="">
+    <img src="~/Content/imgs/mandala1.svg" width="160" height="160" class="d-inline-block align-top" alt="">
+    <img src="~/Content/imgs/mandala1.svg" width="160" height="160" class="d-inline-block align-top" alt="">
+    <img src="~/Content/imgs/mandala1.svg" width="160" height="160" class="d-inline-block align-top" alt="">
+</div>
+<script>
+    $(document).on("click", "i.del", function () {
+        $(this).parent().remove();
+    });
+    $(function () {
+        $(document).on("change", ".uploadFile", function () {
+            var uploadFile = $(this);
+            var files = !!this.files ? this.files : [];
+            if (!files.length || !window.FileReader) {
+                alert('Not .svg file');
+                return;
+            }
+            if (/^image/.test(files[0].type)) { // only image file
+                if (files[0].type != 'image/svg+xml') {
+                    alert('Not .svg file');
+                    return;
+                }
+                var reader = new FileReader(); // instance of the FileReader
+                reader.readAsDataURL(files[0]); // read the local file
+                var fileData = new FormData();
+                fileData.append(files[0].name, files[0]);
+                if (chkAlpha.checked) {
+                    if (txtAlpha.value > -1 && txtAlpha.value < 256) {
+                        fileData.append('TxtAlpha', txtAlpha.value);
+                    } else {
+                        alert('Alpha value is not in range, valid values: 0 to 255');
+                        return;
+                    }
+                }
+                if (chkScale.checked) {
+                    if (txtScale.value > 29 && txtScale.value < 124) {
+                        fileData.append('TxtScale', txtScale.value);
+                    } else {
+                        alert('Scale value is not in range, valid values: 30 to 123');
+                        return;
+                    }
+                }
+                if (chkScale2.checked) {
+                    if (txtScale2.value > 29 && txtScale2.value < 124) {
+                        fileData.append('TxtScale2', txtScale2.value);
+                    } else {
+                        alert('Scale value is not in range, valid values: 30 to 123');
+                        return;
+                    }
+                }
+                if (chkBackground.checked) {
+                    fileData.append('TxtBackground', txtBackground.value);
+                }
+                if (chkBoundingBox.checked) {
+                    if (txtBoundingBox.value >= 0.1 && txtScale.value < 65536) {
+                        fileData.append('TxtBoundingBox', txtBoundingBox.value);
+                    } else {
+                        alert('BoundingBox value is not in range, valid values: 0.1 to 65535');
+                        return;
+                    }
+                }
+                $("#finalImg").attr('src', '@Url.Content("~/Content/imgs/ajax1.gif")');
+                $.ajax({
+                    url: '@Url.Action("ProcessSvg", "Home")',
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: fileData,
+                    success: function (result) {
+                        if (result.Error1 != null)
+                            alert(result.Error1);
+                        else if (result != null) {
+                            $("#finalImg").attr('src', 'data:image/png;base64,' + result);
+                            lnkDownload.href = 'data:application/octet-stream;base64,' + result;
+                            //document.getElementById("finalImg").src = result.ResImg;
+                        }
+                    },
+                    error: function (err) {
+                        if (err.Error1 != null)
+                            alert(err.Error1);
+                    }
+                });
+                reader.onloadend = function () { // set image data as background of div
+                    //alert(uploadFile.closest(".upimage").find('.imagePreview').length);
+                    uploadFile.closest(".imgUp").find('.imagePreview').css("background-image", "url(" + this.result + ")");
+                }
+            } else alert('Not .svg file');
+        });
+    });
+</script>
