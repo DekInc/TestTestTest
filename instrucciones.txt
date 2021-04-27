@@ -1,0 +1,27 @@
+Hola Hilmer,
+
+Te paso entonces por acá las especificaciones del mini programa de prueba. Hay varios términos y cuestiones técnicas acá, y la idea es que las busques en internet en caso que no las conozcas ya.
+
+Hacer una app ASP.NET MVC que...
+
+- Reciba del cliente web un documento SVG
+- Cambie el canal alfa de cualquier color en el documento al valor 128 (semi-transparente).
+* Escale todas los paths en el documento SVG para que tengan la mitad de su tamaño original.
+- Renderize el documento SVG modificado en un bitmap tal que tenga como color de fondo, uno especificado por el cliente.
+- Filtre (remueva del documento) todo path tal que la diagonal de su "bounding box" sea menos a un parámetro especificado por el cliente.
+- Devuelva el bitmap al cliente en formato Base64
+
+1. BoundingBox
+2. Escalado
+3. Establecer alfa
+4. Cambiar fondo
+5. retornar un Base64
+6. Actualizar por ajax la imagen
+
+
+
+Notas: El documento renderizado en el bitmap tiene que tener la orientación correcta. Es decir, si el SVG tiene, digamos, una casa dibujada, no tiene que quedar "hacia abajo" en el bitmap
+
+Hacer también un cliente mínimo que permita elegir el SVG, lo muestre en un canvas a la izquierda, y el bitmap devuelto por el servidor a la derecha.
+
+Saludos
